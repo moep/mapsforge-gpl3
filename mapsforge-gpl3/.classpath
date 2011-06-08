@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="test"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
+	<classpathentry kind="lib" path="lib/junit-4.8.2.jar"/>
+	<classpathentry kind="lib" path="lib/osmosis-core-0.38.jar"/>
+	<classpathentry kind="lib" path="lib/perst-421.jar"/>
+	<classpathentry kind="lib" path="lib/trove-3.0.0rc1.jar"/>
+	<classpathentry kind="lib" path="lib/mapsforge-offboard-routing-0.2.3.jar"/>
+	<classpathentry kind="lib" path="lib/android-2.3.3.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

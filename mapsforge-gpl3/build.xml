@@ -4,8 +4,8 @@ Use this Ant script for convenience with creating a distribution of mapsforge.
 The script in not intended for building the project. Use Eclipse for this
 purpose.
 -->
-<project name="mapsforge">
-	<property name="mapsforge.version" value="0.2.3" />
+<project name="mapsforge-gpl3">
+	<property name="mapsforge.version" value="0.2.4" />
 
 	<property name="mapsforge.bin" value="bin" />
 	<property name="mapsforge.lib" value="lib" />
@@ -13,15 +13,13 @@ purpose.
 	<property name="mapsforge.dist" value="dist" />
 	<property name="mapsforge.doc" value="doc" />
 
-	<property name="mapsforge.samples.lib.dir" value="${basedir}/../Samples/lib" />
-	<property name="mapsforge.routingservlet.lib.dir"
-	          value="${basedir}/../HHRoutingWebservice/WebContent/WEB-INF/lib" />
+	<property name="mapsforge.routingservlet.lib.dir" value="${basedir}/../HHRoutingWebservice/WebContent/WEB-INF/lib" />
 
 	<!-- Path to the properties file that includes the keystore parameters -->
 	<property file="../mapsforge-keystore.properties" />
 
 	<!-- List of files to be included in every distribution (JAR file) -->
-	<fileset dir="." id="info" includes="COPYING, COPYING.LESSER, NEWS" />
+	<fileset dir="." id="info" includes="COPYING, NEWS" />
 
 	<!-- List of all JAR files in the library folder -->
 	<path id="classpath">
@@ -33,9 +31,7 @@ purpose.
 
 	<!-- Check if the keystore exists -->
 	<target name="check-for-keystore">
-		<available file="${mapsforge.keystore.location}"
-		           type="file"
-		           property="keystore.present" />
+		<available file="${mapsforge.keystore.location}" type="file" property="keystore.present" />
 	</target>
 
 
@@ -58,7 +54,7 @@ purpose.
 	</target>
 
 
-	
+
 
 
 	<!-- ################## mapsforge-poi-osmosis.jar ################## -->
@@ -67,21 +63,15 @@ purpose.
 	<target name="mapsforge-poi-osmosis-jar-create">
 		<mkdir dir="${mapsforge.dist}" />
 		<!-- Include source code and generated class files, avoid duplicates -->
-		<jar destfile="${mapsforge.dist}/mapsforge-poi-osmosis-${mapsforge.version}.jar"
-		     duplicate="preserve">
-			<fileset dir="${mapsforge.src}"
-			         includes="org/mapsforge/preprocessing/osmosis/poi/"
-			         excludes="*.xml" />
-			<fileset dir="${mapsforge.bin}"
-			         includes="org/mapsforge/preprocessing/osmosis/poi/"
-			         excludes="*.xml" />
+		<jar destfile="${mapsforge.dist}/mapsforge-poi-osmosis-${mapsforge.version}.jar" duplicate="preserve">
+			<fileset dir="${mapsforge.src}" includes="org/mapsforge/preprocessing/osmosis/poi/" excludes="*.xml" />
+			<fileset dir="${mapsforge.bin}" includes="org/mapsforge/preprocessing/osmosis/poi/" excludes="*.xml" />
 			<fileset dir="${mapsforge.src}" includes="org/mapsforge/poi/" />
 			<fileset dir="${mapsforge.bin}" includes="org/mapsforge/poi/" />
 			<fileset dir="${mapsforge.src}" includes="org/mapsforge/core/" />
 			<fileset dir="${mapsforge.bin}" includes="org/mapsforge/core/" />
 			<fileset refid="info" />
-			<fileset dir="${mapsforge.src}/org/mapsforge/preprocessing/osmosis/poi/"
-			         includes="*.xml" />
+			<fileset dir="${mapsforge.src}/org/mapsforge/preprocessing/osmosis/poi/" includes="*.xml" />
 		</jar>
 		<antcall target="eclipse-refresh">
 			<param name="ressource" value="mapsforge/${mapsforge.dist}" />
@@ -89,14 +79,8 @@ purpose.
 	</target>
 
 	<!-- Sign and verify the JAR file if the keystore exists -->
-	<target name="mapsforge-poi-osmosis-jar-sign"
-	        depends="check-for-keystore,mapsforge-poi-osmosis-jar-create"
-	        if="keystore.present">
-		<signjar jar="${mapsforge.dist}/mapsforge-poi-osmosis-${mapsforge.version}.jar"
-		         keystore="${mapsforge.keystore.location}"
-		         storepass="${mapsforge.keystore.pass}"
-		         alias="${mapsforge.keystore.alias}"
-		         keypass="${mapsforge.key.pass}" />
+	<target name="mapsforge-poi-osmosis-jar-sign" depends="check-for-keystore,mapsforge-poi-osmosis-jar-create" if="keystore.present">
+		<signjar jar="${mapsforge.dist}/mapsforge-poi-osmosis-${mapsforge.version}.jar" keystore="${mapsforge.keystore.location}" storepass="${mapsforge.keystore.pass}" alias="${mapsforge.keystore.alias}" keypass="${mapsforge.key.pass}" />
 		<!-- Verify the signed JAR file and stop if verification was not successful -->
 		<exec executable="jarsigner" failonerror="true">
 			<arg value="-verify" />
@@ -108,8 +92,52 @@ purpose.
 	</target>
 
 	<target name="mapsforge-poi-osmosis-jar-copy" depends="mapsforge-poi-osmosis-jar-sign">
-		<copy overwrite="true"
-		      file="${mapsforge.dist}/mapsforge-poi-osmosis-${mapsforge.version}.jar"
-		      todir="${user.home}/.openstreetmap/osmosis/plugins" />
+		<copy overwrite="true" file="${mapsforge.dist}/mapsforge-poi-osmosis-${mapsforge.version}.jar" todir="${user.home}/.openstreetmap/osmosis/plugins" />
+	</target>
+
+	<!-- ################## mapsforge-routing-directions.jar ################## -->
+
+
+	<!-- Create the JAR file -->
+	<target name="mapsforge-routing-directions-jar-create">
+		<mkdir dir="${mapsforge.dist}" />
+		<!-- Include source code and generated class files, avoid duplicates -->
+		<jar destfile="${mapsforge.dist}/mapsforge-routing-directions-${mapsforge.version}.jar" duplicate="preserve">
+			<fileset dir="${mapsforge.bin}" includes="org/mapsforge/directions/" />
+			<fileset dir="${mapsforge.src}" includes="org/mapsforge/directions/" />
+			<fileset dir="${mapsforge.bin}" includes="org/mapsforge/poi/" />
+			<fileset dir="${mapsforge.src}" includes="org/mapsforge/poi/" />
+			<!--<fileset dir="${mapsforge.bin}" includes="org/mapsforge/poi/exchange/" />
+			<fileset dir="${mapsforge.src}" includes="org/mapsforge/poi/exchange/" />
+			<fileset dir="${mapsforge.bin}" includes="org/mapsforge/poi/persistence/" />
+			<fileset dir="${mapsforge.src}" includes="org/mapsforge/poi/persistence/" />-->
+			<fileset refid="info" />
+		</jar>
+		<antcall target="eclipse-refresh">
+			<param name="ressource" value="mapsforge/${mapsforge.dist}" />
+		</antcall>
+	</target>
+
+
+	<!-- Sign and verify the JAR file if the keystore exists -->
+	<target name="mapsforge-routing-directions-jar-sign" depends="check-for-keystore,mapsforge-routing-directions-jar-create" if="keystore.present">
+		<signjar jar="${mapsforge.dist}/mapsforge-routing-directions-${mapsforge.version}.jar" keystore="${mapsforge.keystore.location}" storepass="${mapsforge.keystore.pass}" alias="${mapsforge.keystore.alias}" keypass="${mapsforge.key.pass}" />
+		<!-- Verify the signed JAR file and stop if verification was not successful -->
+		<exec executable="jarsigner" failonerror="true">
+			<arg value="-verify" />
+			<arg value="${mapsforge.dist}/mapsforge-routing-directions-${mapsforge.version}.jar" />
+		</exec>
+		<antcall target="eclipse-refresh">
+			<param name="ressource" value="mapsforge/${mapsforge.dist}" />
+		</antcall>
+	</target>
+
+
+	<!-- Copy the created JAR file to the servlet directory -->
+	<target name="mapsforge-routing-directions-jar-copy" depends="mapsforge-routing-directions-jar-create,mapsforge-routing-directions-jar-sign">
+		<copy overwrite="true" file="${mapsforge.dist}/mapsforge-routing-directions-${mapsforge.version}.jar" todir="${mapsforge.routingservlet.lib.dir}" />
+		<antcall target="eclipse-refresh">
+			<param name="ressource" value="${basedir}/../HHRoutingWebservice" />
+		</antcall>
 	</target>
 </project>

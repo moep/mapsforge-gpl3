@@ -2,16 +2,16 @@
  * Copyright 2010, 2011 mapsforge.org
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
+ * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
@@ -26,9 +26,11 @@
  */
 package org.mapsforge.server.ws;
 
+
+
+
 import java.io.FileInputStream;
 import java.io.IOException;
-
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Properties;
@@ -38,15 +40,14 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.mapsforge.core.Edge;
 import org.mapsforge.core.GeoCoordinate;
-import org.mapsforge.server.routing.IEdge;
-import org.mapsforge.server.routing.IRouter;
-import org.mapsforge.server.routing.IVertex;
-import org.mapsforge.server.routing.highwayHierarchies.HHRouterServerside;
-
+import org.mapsforge.core.Router;
+import org.mapsforge.core.Vertex;
 import org.mapsforge.directions.LandmarksFromPerst;
 import org.mapsforge.directions.TurnByTurnDescription;
 import org.mapsforge.directions.TurnByTurnDescriptionToString;
+import org.mapsforge.server.highwayHierarchies.HHRouterServerside;
 
 /**
  * Servlet implementation class HHRoutingWebservice
@@ -54,7 +55,7 @@ import org.mapsforge.directions.TurnByTurnDescriptionToString;
 public class HHRoutingWebservice extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	
-	private static IRouter router;
+	private static Router router;
 
 	private LandmarksFromPerst landmarkService; 
 	private String propertiesURI;
@@ -99,7 +100,7 @@ public class HHRoutingWebservice extends HttpServlet {
 
 			boolean use_landmarks = request.getParameter("landmarks") != null;
 
-			IEdge[] routeEdges = router.getShortestPath(pointIds.get(0), pointIds.get(1));
+			Edge[] routeEdges = router.getShortestPath(pointIds.get(0), pointIds.get(1));
 			if (routeEdges == null || routeEdges.length == 0) {
 				response.setStatus(500);
 				out.print("<error>It seems like I was not able to find a route. Sorry about that!</error>");
@@ -145,7 +146,7 @@ public class HHRoutingWebservice extends HttpServlet {
 		for (int i = 0; i < alternatingCoordinates.length - (alternatingCoordinates.length%2); i += 2) {
 			double lon = Double.valueOf(alternatingCoordinates[i]);
 			double lat = Double.valueOf(alternatingCoordinates[i+1]);
-			IVertex nv = router.getNearestVertex(new GeoCoordinate(lat, lon));
+			Vertex nv = router.getNearestVertex(new GeoCoordinate(lat, lon));
 			if (nv != null) {
 				int id = nv.getId();
 				pp.add(id);
